@@ -7,19 +7,25 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import Image from "next/image";
 
+interface RouteParams {
+    params: {
+        id: string;
+    };
+}
+
 const Page = async ({ params }: RouteParams) => {
-    const { id } = await params;
+    const { id } = params; // Correctly extract 'id' from params
     const user = await getCurrentUser();
-    
+
     const interview = await getInterviewById(id);
     if(!interview) redirect('/')
 
     const feedback = await getFeedbackByInterviewId({
-        interview: id,
+        interviewId: id, // Corrected parameter name to 'interviewId'
         userId: user?.id!,
     });
 
-    console.log(feedback);
+    console.log("Feedback data:", feedback); // Keep this for debugging on the server
 
     return (
         <section className="section-feedback">
@@ -38,8 +44,8 @@ const Page = async ({ params }: RouteParams) => {
                         <p>
                             Overall Impression:{" "}
                             <span className="text-primary-200 font-bold">
-                {feedback?.totalScore}
-              </span>
+                                {feedback?.totalScore !== undefined ? feedback.totalScore : "N/A"}
+                            </span>
                             /100
                         </p>
                     </div>
@@ -49,7 +55,7 @@ const Page = async ({ params }: RouteParams) => {
                         <Image src="/calendar.svg" width={22} height={22} alt="calendar" />
                         <p>
                             {feedback?.createdAt
-                                ? dayjs(feedback.createdAt).format("MMM D, YYYY h:mm A")
+                                ? dayjs(feedback.createdAt).format("MMM D, YYYY h:mm A") // Corrected date formatting
                                 : "N/A"}
                         </p>
                     </div>
@@ -58,37 +64,49 @@ const Page = async ({ params }: RouteParams) => {
 
             <hr />
 
-            <p>{feedback?.finalAssessment}</p>
+            <p>{feedback?.finalAssessment || "No final assessment available."}</p>
 
             {/* Interview Breakdown */}
             <div className="flex flex-col gap-4">
                 <h2>Breakdown of the Interview:</h2>
-                {feedback?.categoryScores?.map((category, index) => (
-                    <div key={index}>
-                        <p className="font-bold">
-                            {index + 1}. {category.name} ({category.score}/100)
-                        </p>
-                        <p>{category.comment}</p>
-                    </div>
-                ))}
+                {feedback?.categoryScores && feedback.categoryScores.length > 0 ? (
+                    feedback.categoryScores.map((category: { name: string; score: number; comment: string }, index: number) => (
+                        <div key={index}>
+                            <p className="font-bold">
+                                {index + 1}. {category.name} ({category.score}/100)
+                            </p>
+                            <p>{category.comment || "No comment provided for this category."}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p>No breakdown of categories available.</p>
+                )}
             </div>
 
             <div className="flex flex-col gap-3">
                 <h3>Strengths</h3>
-                <ul>
-                    {feedback?.strengths?.map((strength, index) => (
-                        <li key={index}>{strength}</li>
-                    ))}
-                </ul>
+                {feedback?.strengths && feedback.strengths.length > 0 ? (
+                    <ul>
+                        {feedback.strengths.map((strength: string, index: number) => (
+                            <li key={index}>{strength}</li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No strengths identified.</p>
+                )}
             </div>
 
             <div className="flex flex-col gap-3">
                 <h3>Areas for Improvement</h3>
-                <ul>
-                    {feedback?.areasForImprovement?.map((area, index) => (
-                        <li key={index}>{area}</li>
-                    ))}
-                </ul>
+                {feedback?.areasForImprovement && feedback.areasForImprovement.length > 0 ? (
+                    <ul>
+                        {feedback.areasForImprovement.map((area: string, index: number) => (
+                            <li key={index}>{area}</li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No areas for improvement identified.</p>
+                )}
             </div>
 
             <div className="buttons">

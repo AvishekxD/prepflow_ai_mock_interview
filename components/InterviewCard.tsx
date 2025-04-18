@@ -1,17 +1,27 @@
 // import React from 'react'
 import dayjs from "dayjs";
 import Image from "next/image";
-import {getRandomInterviewCover} from "@/lib/utils";
-import {Button} from "@/components/ui/button";
+import { getRandomInterviewCover } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import DisplayTechIcons from "@/components/DisplayTechIcons";
-import {getFeedbackByInterviewId} from "@/lib/actions/general.action";
+import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
+
+interface InterviewCardProps {
+    id: string;
+    userId: string;
+    role: string;
+    type: string;
+    techstack: string[];
+    createdAt: string;
+}
 
 const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: InterviewCardProps) => {
-    const feedback = userId && id ? await getFeedbackByInterviewId({ interviewId: id, userId}) : null;
+    const feedback = await getFeedbackByInterviewId({ interviewId: id, userId });
 
     const normalizedType = /mix/gi.test(type) ? 'Mixed' : type;
-    const formattedDate = dayjs(feedback?.createdAt || createdAt || Date.now()).format('MMM D, YYYY');
+    const formattedDate = dayjs(feedback?.createdAt || createdAt || Date.now()).format('MMM D, YYYY'); // Added 'YYYY' for the year
+
     return (
         <div className="card-border w-[360px] max-sm:w-full min-h-96">
             <div className="card-interview">
@@ -32,7 +42,7 @@ const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: I
                         </div>
                         <div className="flex flex-row gap-2 items-center">
                             <Image src="/star.svg" alt="star" width={22} height={22} />
-                            <p>{feedback?.totalScore || '---'}/100</p>
+                            <p>{feedback?.totalScore !== undefined ? feedback.totalScore : '---'}/100</p>
                         </div>
                     </div>
                     <p className="line-clamp-2 mt-5">
@@ -54,6 +64,7 @@ const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: I
                 </div>
             </div>
         </div>
-    )
-}
-export default InterviewCard
+    );
+};
+
+export default InterviewCard;
