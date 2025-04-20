@@ -19,6 +19,7 @@ interface InterviewCardProps {
 const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: InterviewCardProps) => {
     const feedback = await getFeedbackByInterviewId({ interviewId: id, userId });
 
+
     const normalizedType = /mix/gi.test(type) ? 'Mixed' : type;
     const formattedDate = dayjs(feedback?.createdAt || createdAt || Date.now()).format('MMM D, YYYY'); // Added 'YYYY' for the year
 

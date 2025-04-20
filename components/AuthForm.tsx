@@ -89,7 +89,8 @@ const AuthForm = ({ type }: {type: FormType}) => {
     const isSignIn = type === 'sign-in';
 
     return (
-        <div className="card-border lg:min-w-[566px]">
+
+        <div className="card-border lg:min-w-[366px]">
             <div className="flex flex-col gap-6 card py-14 px-10">
                 <div className="flex flex-row gap-2 justify-center">
                     <Image
@@ -133,7 +134,7 @@ const AuthForm = ({ type }: {type: FormType}) => {
                         <Button className="btn" type="submit">{isSignIn ? 'Sign in' : 'create an Account'}</Button>
                     </form>
                 </Form>
-                
+
                 <p className="text-center">
                     {isSignIn ? 'No account yet?' : 'Have an account already?'}
                     <Link href={!isSignIn ? '/sign-in' : '/sign-up'} className="font-bold text-user-primary ml-1">

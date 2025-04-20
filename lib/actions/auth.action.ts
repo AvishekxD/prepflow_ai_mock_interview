@@ -3,7 +3,7 @@
 import {db, auth} from "@/firebase/admin";
 import {cookies} from "next/headers";
 
-const ONE_WEEK = 60 * 60 * 26 * 7;
+const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function signUp(params: SignUpParams){
     const { uid, name, email } = params;
@@ -92,7 +92,6 @@ export async function getCurrentUser(): Promise<User | null> {
     const cookieStore = await cookies();
 
     const sessionCookie = cookieStore.get('session')?.value;
-
     if(!sessionCookie) return null;
 
     try {
@@ -102,7 +101,6 @@ export async function getCurrentUser(): Promise<User | null> {
             .collection('users')
             .doc(decodedClaims.uid)
             .get();
-
         if(!userRecord.exists) return null;
 
         return{
